@@ -38,8 +38,13 @@ public class Dispatcher implements Runnable {
      * Indica si el Dispatcher esta prendido o apagado
      */
     private boolean running;
-
+    
     private ExecutorService executor;
+    
+    /**
+     * Numero de llamadas que tuvieron que esperar a ser atendidas 
+     */
+    private int totalCallsAwait;
 
     public Dispatcher() {
 
@@ -56,6 +61,7 @@ public class Dispatcher implements Runnable {
             this.awaitingCalls = new ConcurrentLinkedDeque<>();
             this.employeesList = Collections.synchronizedList(employees);
             this.running = false;
+            this.totalCallsAwait=0;
         }
     }
 
@@ -100,10 +106,14 @@ public class Dispatcher implements Runnable {
                 logger.info("Buscando asesor para llamada {}", call.getId());
                 Employee employee = availableEmployee();
                 if (employee == null) {
+                    call.setHadWait(true);
                     getAwaitingCalls().addFirst(call);
                     continue;
                 }
                 try {
+                    if(call.isHadWait()){
+                        setTotalCallsAwait(getTotalCallsAwait()+1);
+                    }
                     employee.start(call);
                 } catch (Exception err) {
                     getAwaitingCalls().addFirst(call);
@@ -183,6 +193,14 @@ public class Dispatcher implements Runnable {
 
     public void setExecutor(ExecutorService executor) {
         this.executor = executor;
+    } 
+
+    public int getTotalCallsAwait() {
+        return totalCallsAwait;
+    }
+
+    public void setTotalCallsAwait(int totalCallsAwait) {
+        this.totalCallsAwait = totalCallsAwait;
     }
 
 }

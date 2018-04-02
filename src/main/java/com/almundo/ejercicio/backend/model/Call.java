@@ -18,7 +18,12 @@ public class Call {
    * Tiempo de llamada en segundos
    */
   private int time;
-
+  
+  /**
+   * indica si la llamada tuvo que esperar a ser atendida
+   */
+    
+private boolean hadWait;
   
   public Call(){
       
@@ -32,6 +37,7 @@ public class Call {
       Random randomGenerator = new Random();
       this.time =time;
       this.id  = randomGenerator.nextInt();
+      this.hadWait= false;
               
   }
 
@@ -49,6 +55,14 @@ public class Call {
 
     public void setTime(int time) {
         this.time = time;
+    }
+
+    public boolean isHadWait() {
+        return hadWait;
+    }
+
+    public void setHadWait(boolean hadWait) {
+        this.hadWait = hadWait;
     }
 
   

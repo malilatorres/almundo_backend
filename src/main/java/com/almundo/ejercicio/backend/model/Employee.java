@@ -28,11 +28,17 @@ public class Employee implements Runnable {
     private String name;
 
     /** 
+     * NUmero de llamadas atendidas
+     */
+    private int attendedCalls;
+    
+    /** 
      * Cola de llamadas del empleado
      */
     private ConcurrentLinkedDeque<Call> callsQueue;
     
     private static final Logger logger = LoggerFactory.getLogger(Employee.class);
+    
  
 
     public Employee(String name, RoleEnum role, boolean free) {
@@ -40,13 +46,14 @@ public class Employee implements Runnable {
         this.role = role;
         this.free = free;
         this.callsQueue = new ConcurrentLinkedDeque<>();
+        this.attendedCalls=0;
     }
 
     public void start(Call call) {
         getCallsQueue().add(call);
         logger.info("Empleado {} - {} recibió la llamada  {}  de {} segundos",
                 getName(), getRole(), call.getId(), call.getTime());
-
+        
     }
 
     /**
@@ -59,6 +66,7 @@ public class Employee implements Runnable {
             if (!getCallsQueue().isEmpty()) {
                 Call call = getCallsQueue().poll();
                 setFree(false);
+                setAttendedCalls(getAttendedCalls()+1);
                 logger.info("Llamada contestada por el empleado {} - {}", getName(), getRole());
                 try {
                     TimeUnit.SECONDS.sleep(call.getTime());
@@ -69,6 +77,8 @@ public class Employee implements Runnable {
                 }
                 logger.info("Llamada {} terminada despues de {} segundos. Empleado {}", 
                         call.getId(), call.getTime(), getName());
+                
+                
             }
         } while (true);
 
@@ -106,4 +116,13 @@ public class Employee implements Runnable {
         this.callsQueue = callsQueue;
     }
 
+    public int getAttendedCalls() {
+        return attendedCalls;
+    }
+
+    public void setAttendedCalls(int attendedCalls) {
+        this.attendedCalls = attendedCalls;
+    }
+
+    
 }
